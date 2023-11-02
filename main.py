@@ -14,6 +14,14 @@ def result():
         result['Student Number']=request.form.get('StudentNumber')
         result['Gender']=request.form.get('Gender')
         result['Major']=request.form.get('Major')
+        lang = [request.form.get('Python'), request.form.get('Java'), request.form.get('HTML'), request.form.get('C++')]
+        lang = list(filter(None, lang))
+        result['languages']=','.join(lang)
+
+
+
+
+
         
         return render_template('result.html',result=result)
 
