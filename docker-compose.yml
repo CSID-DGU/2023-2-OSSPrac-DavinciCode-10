@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  app:
+  web:
     build: .
     image: dldbqls0019/hw6:3.0
     ports:
