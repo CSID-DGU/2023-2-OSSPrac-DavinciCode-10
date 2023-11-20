@@ -3,6 +3,6 @@ version: '3'
 services:
   web:
     build: .
-    image: dldbqls0019/hw6:3.0
+    image: dldbqls0019/hw6
     ports:
       - "5000:5000"
