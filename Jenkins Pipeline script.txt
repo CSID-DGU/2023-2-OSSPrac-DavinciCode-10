@@ -1,0 +1,66 @@
+pipeline {
+    agent any  
+
+	triggers {
+			pollSCM('*/3 * * * *')
+	} 
+
+    environment {
+        DOCKER = credentials('dockerhub')    
+    } 
+
+    stages {
+        stage('Prepare') {
+	 agent any 
+	
+            steps {							
+		git url : 'https://github.com/CSID-DGU/2023-2-OSSPrac-DavinciCode-10.git',
+						branch : 'main',
+						credentialsId: 'github'
+            }
+        }
+
+        stage('Clone Repository') {
+            steps {
+                script {
+                    def repoURL = 'https://github.com/CSID-DGU/2023-2-OSSPrac-DavinciCode-10.git'
+                    def targetDir = '/var/jenkins_home/workspace/prac12_c'
+
+                    // Git 저장소를 클론하고 특정 디렉토리에 저장
+                    checkout([$class: 'GitSCM',
+                              branches: [[name: 'main']],
+                              doGenerateSubmoduleConfigurations: false,
+                              extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: targetDir]],
+                              submoduleCfg: [],
+                              userRemoteConfigs: [[url: repoURL]]])
+                }
+            }
+        }
+
+        stage('Build') {
+            
+            steps {
+                dir('/var/jenkins_home/workspace/prac12_c'){
+                    sh 'docker compose build web'
+                }
+           }
+        }
+
+        stage('Tag') {
+            steps {
+                script {
+                    sh "docker tag ${DOCKER_USR}/hw6 ${DOCKER_USR}/hw6:${BUILD_NUMBER}"
+                }
+            }
+        }
+
+        stage('Push') {
+            steps {
+                script {
+                    sh "docker login -u $DOCKER_USR -p $DOCKER_PSW"
+		            sh "docker push ${DOCKER_USR}/hw6:${BUILD_NUMBER}"
+                }
+            }
+        }
+    }
+}
